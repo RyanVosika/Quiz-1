@@ -1,0 +1,104 @@
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+#include <sstream> 
+
+using namespace std;
+
+struct Date {
+    int day;
+    int month;
+    int year;
+};
+
+struct Appointment {
+    int id;
+    string name;
+    Date date;
+    string purpose;
+};
+
+Appointment schedule[50];
+int appointmentCount = 0;
+
+bool sameDate(const Date& d1, const Date& d2) {
+    return d1.day == d2.day && d1.month == d2.month && d1.year == d2.year;
+}
+
+
+string formatDate(const Date& d) {
+    std::ostringstream out;
+    out << std::setfill('0') << std::setw(2) << d.day << "/"
+        << std::setw(2) << d.month << "/"
+        << std::setw(4) << d.year;
+    return out.str();
+}
+
+int main() {
+    srand(static_cast<unsigned int>(time(0)));
+
+    int choice;
+    cout << "*********** Appointment Scheduler ***********\n";
+    do {
+        cout << "1. Add Appointment\n";
+        cout << "2. View Appointments by Date\n";
+        cout << "3. Exit\n";
+        cout << "Choice: ";
+        cin >> choice;
+
+        if (choice == 1) {
+            if (appointmentCount >= 50) {
+                cout << "Schedule is full! Cannot add more appointments.\n";
+                continue;
+            }
+            Appointment appt;
+            cin.ignore();
+            cout << "Name: ";
+            getline(cin, appt.name);
+            cout << "Date (DD MM YYYY): ";
+            cin >> appt.date.day >> appt.date.month >> appt.date.year;
+            cin.ignore();
+            cout << "Purpose: ";
+            getline(cin, appt.purpose);
+            appt.id = 1000 + rand() % 9000;
+            schedule[appointmentCount++] = appt;
+            cout << "Appointment added! ID: " << appt.id << endl;
+            cout << "---------------------------------------------\n";
+        }
+        else if (choice == 2) {
+            if (appointmentCount == 0) {
+                cout << "No appointments scheduled yet.\n";
+                cout << "---------------------------------------------\n";
+                continue;
+            }
+            Date searchDate;
+            cout << "Enter date (DD MM YYYY): ";
+            cin >> searchDate.day >> searchDate.month >> searchDate.year;
+            bool found = false;
+            cout << "Appointments on " << formatDate(searchDate) << ":\n";
+            for (int i = 0; i < appointmentCount; ++i) {
+                if (sameDate(schedule[i].date, searchDate)) {
+                    cout << "ID: " << schedule[i].id
+                        << " | " << schedule[i].name
+                        << " | " << schedule[i].purpose << endl;
+                    found = true;
+                }
+            }
+            if (!found) {
+                cout << "No appointments for this date.\n";
+            }
+            cout << "---------------------------------------------\n";
+        }
+        else if (choice == 3) {
+            cout << "Thank you for using the scheduler!\n";
+            cout << "CMPS 385: Data Structures Fall 2025\n";
+        }
+        else {
+            cout << "Invalid choice! Please select 1, 2, or 3.\n";
+        }
+    } while (choice != 3);
+
+    return 0;
+}
